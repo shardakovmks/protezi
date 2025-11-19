@@ -1,0 +1,124 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+    <title>Протезы</title>
+    
+</head>
+<body>
+    <a href="index.htm"> <img src="https://cdn-icons-png.flaticon.com/512/64/64817.png" width="40" height="40" alt="Вернутся на главную"></a>
+    <div class="container">
+        <div class="section">
+            <h3>Информация о протезах</h3>
+            <select id="prosthesisMenu" onchange="showInfo()">
+                <option value="">Выберите тип протеза</option>
+                <option value="bionic">Бионические протезы</option>
+                <option value="cosmetic">Косметические протезы</option>
+                <option value="sports">Спортивные протезы</option>
+            </select>
+            <div id="output"></div>
+        </div>
+
+
+        <div class="section">
+            <h3>Расчет стоимости</h3>
+            <input type="number" id="price" placeholder="Базовая цена">
+            <button onclick="calculatePrice()">Рассчитать</button>
+            <p id="result"></p>
+            <p>Текущая дата: <span id="date"></span></p>
+        </div>
+
+
+        <div class="section">
+            <h3>Статистика пациентов</h3>
+            <input type="text" id="patientName" placeholder="Имя пациента">
+            <input type="number" id="therapyScore" placeholder="Балл реабилитации">
+            <button onclick="addPatient()">Добавить</button>
+            <button onclick="calculateStats()">Рассчитать статистику</button>
+            
+            <table id="patientsTable">
+                <tr>
+                    <th>Имя</th>
+                    <th>Балл</th>
+                </tr>
+            </table>
+            
+            <div id="stats"></div>
+        </div>
+    </div>
+
+    <script>
+
+        function showInfo() {
+            const menu = document.getElementById('prosthesisMenu');
+            const output = document.getElementById('output');
+            const messages = {
+                bionic: "Бионические протезы с электронным управлением",
+                cosmetic: "Косметические протезы с натуральным видом",
+                sports: "Специализированные протезы для спорта"
+            };
+            output.innerHTML = messages[menu.value] || "";
+        }
+
+
+        function calculatePrice() {
+            const basePrice = Number(document.getElementById('price').value);
+            if (basePrice > 0) {
+                const finalPrice = Math.round(basePrice * 1.2); // Math + 20%
+                document.getElementById('result').textContent = 
+                    `Итоговая цена: ${finalPrice} руб.`;
+            }
+        }
+
+
+        const now = new Date();
+        document.getElementById('date').textContent = 
+            now.toLocaleDateString('ru-RU'); // Формат даты
+
+        let patients = [];
+
+        function addPatient() {
+            const name = document.getElementById('patientName').value;
+            const score = Number(document.getElementById('therapyScore').value);
+            
+            if (name && score >= 0) {
+                patients.push({ name, score });
+                updateTable();
+                // Очистка полей ввода
+                document.getElementById('patientName').value = '';
+                document.getElementById('therapyScore').value = '';
+            }
+        }
+
+        function updateTable() {
+            const table = document.getElementById('patientsTable');
+
+            while (table.rows.length > 1) table.deleteRow(1);
+            
+            patients.forEach(patient => {
+                const row = table.insertRow();
+                row.insertCell(0).textContent = patient.name;
+                row.insertCell(1).textContent = patient.score;
+            });
+        }
+
+        function calculateStats() {
+            if (patients.length === 0) return;
+            
+            const totalPatients = patients.length;
+            const totalScore = patients.reduce((sum, patient) => sum + patient.score, 0);
+            const averageScore = (totalScore / totalPatients).toFixed(2);
+            
+            document.getElementById('stats').innerHTML = `
+                <p>Всего пациентов: ${totalPatients}</p>
+                <p>Сумма баллов: ${totalScore}</p>
+                <p>Средний балл: ${averageScore}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
+
+
